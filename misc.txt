@@ -1,0 +1,9 @@
+Key endpoints for Discovery And Enrichment API:
+- POST /api/v2/public/data-discovery/discovery
+- POST /api/v2/public/data-discovery/enrichment
+- POST /api/v2/public/data-discovery/list
+
+Key endpoints for Dataset API:
+- GET /api/v2/public/datasets/{dataset_id}
+- POST /api/v2/public/datasets/search
+- GET /api/v2/public/datasets/download/{dataset_id}
