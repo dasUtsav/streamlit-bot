@@ -4,3 +4,4 @@ python-dotenv>=1.0.0
 selenium>=4.18.0
 selenium-wire
 webdriver_manager
+undetected-chromedriver>=3.5.5
