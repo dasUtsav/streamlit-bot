@@ -2,34 +2,23 @@ import streamlit as st
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
-import undetected_chromedriver as uc
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from playwright.sync_api import sync_playwright
 import time
 
 load_dotenv()
 
 def fetch_notion_content(url):
-    options = uc.ChromeOptions()
-    options.add_argument('--headless')
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--disable-gpu')
-    
-    driver = uc.Chrome(options=options)
-    
-    try:
-        driver.get(url)
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page()
+        page.goto(url)
         
         # Wait for content to load
-        WebDriverWait(driver, 20).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "notion-page-content"))
-        )
-        time.sleep(5)  # Additional wait for dynamic content
+        page.wait_for_selector('.notion-page-content')
+        time.sleep(5)  # Wait for dynamic content
         
         # Expand all toggles
-        toggles = driver.find_elements(By.CSS_SELECTOR, "[role='button']")
+        toggles = page.query_selector_all('[role="button"]')
         for toggle in toggles:
             try:
                 toggle.click()
@@ -38,11 +27,9 @@ def fetch_notion_content(url):
                 continue
         
         # Get content
-        content = driver.find_element(By.CLASS_NAME, "notion-page-content").text
+        content = page.query_selector('.notion-page-content').inner_text()
+        browser.close()
         return content
-    
-    finally:
-        driver.quit()
 
 @st.cache_data
 def load_api_docs():
